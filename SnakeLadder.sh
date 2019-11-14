@@ -4,19 +4,24 @@ echo ---------------------Welcome To Snake and Ladder World--------------------
 START=0;
 PLAYER=1;
 NO=0;
-LADDER=1;
-SNAKE=2;
+LADDER=2;
+SNAKE=1;
 position=0;
-random=$((RANDOM%3))
-random1=$((RANDOM%6+1))
 function Plays()
-{
- case $random in $NO)
-      position=0;;
-                $LADDER)
-      positon=$(($postion+$random1));;
-                $Snake)
-      positon=$(($postion-$random1));;
- esac  
-}
+{ 
+  while [ $position -le 100 ]
+  do
+   random=$((RANDOM%3))
+   random1=$((RANDOM%6+1))
+   case $random in  $SNAKE )
+        position=$(($position-$random1));;
+                   $LADDER )
+        position=$(($position+$random1));;
+   esac
+   if [ $position -le 0 ]
+   then
+       position=0;
+   fi
+  done
+} 
 Plays
