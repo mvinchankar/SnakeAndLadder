@@ -9,7 +9,7 @@ SNAKE=1;
 position=0;
 function Plays()
 { 
-  while [ $position -le 100 ]
+  while [ $position -le 100  ]
   do
    random=$((RANDOM%3))
    random1=$((RANDOM%6+1))
@@ -21,6 +21,15 @@ function Plays()
    if [ $position -le 0 ]
    then
        position=0;
+   fi
+   if [ $position -gt 100 ]
+   then 
+       position=$(($position-$random1))
+   fi
+   if [ $position -eq 100 ]
+   then 
+       echo You Win
+       break;  
    fi
   done
 } 
