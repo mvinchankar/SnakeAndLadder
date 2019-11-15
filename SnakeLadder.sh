@@ -1,75 +1,112 @@
-#!/bin/bash -x
-echo ---------------------Welcome To Snake and Ladder World--------------------
 
-START=0;
-NO=0;
-LADDER=2;
-SNAKE=1;
-position=0;
-diceCount=0;
-playerOneCount=0;
-playerTwoCount=0;
-count1=0;
-count2=0;
-playerOnePosition=0;
-playerTwoPosition=0;
-function plays()
-{ 
+#!/bin/bash -x
+echo "snake and ladder game"
+
+position1=0
+position2=0
+player=2
+number=0
+Ladder=1
+snake=2
+diceCount=0
+noPlay=0
+
+function die()
+{
+ random=$(( RANDOM%6+1 ))
+ totalDiePlayed=$(( $totalDiePlayed+1 ))
+}
+function whoWins()
+{
+ while ! [[ $position1 -eq 100 || $position2 -eq 100 ]]
+ do
+   die
+   play
+ done
+}
+
+function getPositionForPlayer2()
+{
+ random1=$((RANDOM%3))
+ case $random1 in  $noPlay )
+      position2=$(($position2+0 ));;
+                   $Ladder )
+      echo "Played again for ladder"
+      position2=$(($position2 + $random))
+      die
+      getPositionForPlayer2 ;;
+                   $snake )
+      position2=$(($position2 - $random));;
+ esac 
+
+}
+
+function getPositionForPlayer1()
+{
+ random1=$((RANDOM%3))
+ case $random1 in  $noPlay )
+      position1=$(($position1+0 ));;
+                   $Ladder )
+      echo "Played again for ladder"
+      position1=$(($position1 + $random))
+      die          
+      getPositionForPlayer1 ;;
+                   $snake )
+      position1=$(($position1 - $random));;
+ esac 
+
+}
+
+
+function play() {
   
-  while [ $position -le 100  ]
-  do
-   random=$((RANDOM%3))
-   random1=$((RANDOM%6+1))
-   diceCount=$(($diceCount+1))
-   case $random in  $SNAKE )
-        position=$(($position-$random1));;
-                   $LADDER )
-        position=$(($position+$random1));;
-   esac
-   
-   if [ $position -le 0 ]
-   then
-       position=0;
-   fi
-   if [ $position -gt 100 ]
-   then 
-       position=$(($position-$random1))
-   fi
-   if [ $playerOnePosition -eq 100 ]
-   then  
-       win=1 
-       echo PlayerOne Win
-       break;  
-   fi
-   if [ $playerTwoPosition -eq 100 ]
-   then 
-       win=1
-       echo Player Two Win
-       break;
-   fi
-   if [ $playerOneCount == 1 ]
-   then
-      playerOneCount=0;
-   elif [ $playerOneCount == 0 ]
-   then 
-      playerOnePosition=$(($position))
-      playerOneCount=1;
-      echo PlayerOnePosition : $position
-   fi
-   if [ $playerOneCount == 1 ]
-   then 
-      playerOneCount=2;
-      if [ playerOneCount == 2 ]
-      then
-          playerTwoCount=0; 
-          if [ $playerTwoCount == 0 ]
-          then
-             playerTwoCount=$(($playerTwoCount+1))
-             playerTwoPosition=$(($position))
-             echo PlayerTwoPosition : $position
-          fi
-      fi
-   fi
+   for(( i=1; i<=$player; i++))
+   do
+     echo $i
+     if [ $i -eq 1 ]
+     then
+        getPositionForPlayer1  
+        if [ $position1 -gt 100 ]
+        then 
+            position1=$(($position1-$random))
+        fi
+    
+        if [ $position1 -eq 100 ]
+        then 
+            echo "player1 win"
+            break
+        fi    
+    
+        if [ $position1 -lt 0 ]
+        then 
+            position1=0
+        fi
+        echo "Position1:" $position1
+     fi
+     if [ $i -eq 2 ]
+     then
+         die
+         getPositionForPlayer2
+         if [ $position2 -gt 100 ]
+         then 
+             position2=$(($position2-$random))
+         fi
+    
+         if [ $position2 -eq 100 ]
+         then 
+             echo  "player2 win"
+         break
+         fi    
+    
+         if [ $position2 -lt 0 ]
+         then 
+             position2=0
+         fi
+         echo "Player2:" $position2
+
+     fi
   done
 }
-plays
+whoWins
+echo dice count :$totalDiePlayed
+
