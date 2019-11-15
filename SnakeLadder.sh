@@ -5,7 +5,6 @@ echo "SNAKE and ladder game"
 positionOfPlayerOne=0
 positionOfPlayerTwo=0
 NUMBEROFPLAYERS=2
-number=0
 LADDER=1
 SNAKE=2
 diceCount=0
