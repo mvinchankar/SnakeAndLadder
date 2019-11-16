@@ -1,111 +1,107 @@
-
 #!/bin/bash -x
-echo "SNAKE and ladder game"
 
-positionOfPlayerOne=0
-positionOfPlayerTwo=0
-NUMBEROFPLAYERS=2
-LADDER=1
-SNAKE=2
-diceCount=0
-NOPLAY=0
+echo "Welcome To Snake And Ladder World"
 
-function toDie()
-{
- random=$(( RANDOM%6+1 ))
- totalDiePlayed=$(( $totalDiePlayed+1 ))
+NO_PLAY=1
+LADDER=2
+SNAKE=3
+END=100
+START=0
+FIRST_PLAYER=1
+SECOND_PLAYER=2
+switchPlayers=0
+ladderPosition=0
+
+positionOfPlayer=$START
+checkPosition=$START
+positionOfPlayerOne=$START
+positionOfPlayerTwo=$START
+
+function rollDice() {
+
+dieRandomNumber=$(( ( RANDOM % 6 ) + 1 ))
+checkPosition=$(( ( RANDOM % 3 ) + 1 ))
+
+case $checkPosition in
+   $NO_PLAY)
+         positionOfPlayer=$positionOfPlayer    
+         ;;
+   $LADDER)
+         positionOfPlayer=$(( $positionOfPlayer + $dieRandomNumber ))
+         ladderPosition=1
+         ;;
+    $SNAKE)
+         
+         positionOfPlayer=$( positionOfPlayers $positionOfPlayer $dieRandomNumber )
+         ;;
+esac
 }
-function whoWins()
-{
- while ! [[ $positionOfPlayerOne -eq 100 || $positionOfPlayerTwo -eq 100 ]]
- do
-   toDie
-   play
- done
+function checkIfLadderComes() {
+     checkWhetherItIsGreaterThanEnd $positionOfPlayer
+     while [ $ladderPosition == 1 ]
+     do
+        ladderPosition=0
+        rollDice
+        checkWhetherItIsGreaterThanEnd $positionOfPlayer
+     done
+     
+}
+function positionOfPlayers() {
+         
+     if [ $1 -gt $START ]
+     then
+         positionOfPlayer=$(( $positionOfPlayer-$2 ))
+     else
+         positionOfPlayer=0
+     fi
+
+     echo $positionOfPlayer 
 }
 
-function getPositionForPlayer2()
-{
- random1=$((RANDOM%3))
- case $random1 in  $NOPLAY )
-      positionOfPlayerTwo=$(($positionOfPlayerTwo+0 ));;
-                   $LADDER )
-      echo "Played again for ladder"
-      positionOfPlayerTwo=$(($positionOfPlayerTwo + $random))
-      toDie
-      getPositionForPlayer2 ;;
-                   $SNAKE )
-      positionOfPlayerTwo=$(($positionOfPlayerTwo - $random));;
- esac 
-
+function checkWhetherItIsGreaterThanEnd() {
+     
+     if [ $1 -gt $END ]
+     then
+             positionOfPlayer=$(( $positionOfPlayer - $dieRandomNumber ))  
+     fi
 }
-
-function getPositionForPlayer1()
-{
- random1=$((RANDOM%3))
- case $random1 in  $NOPLAY )
-      positionOfPlayerOne=$(($positionOfPlayerOne+0 ));;
-                   $LADDER )
-      echo "Played again for ladder"
-      positionOfPlayerOne=$(($positionOfPlayerOne + $random))
-      toDie          
-      getPositionForPlayer1 ;;
-                   $SNAKE )
-      positionOfPlayerOne=$(($positionOfPlayerOne - $random));;
- esac 
-
-}
-
 
 function play() {
-  
-   for(( i=1; i<=$NUMBEROFPLAYERS; i++))
-   do
-     echo $i
-     if [ $i -eq 1 ]
-     then
-        getPositionForPlayer1  
-        if [ $positionOfPlayerOne -gt 100 ]
-        then 
-            positionOfPlayerOne=$(($positionOfPlayerOne-$random))
-        fi
-    
-        if [ $positionOfPlayerOne -eq 100 ]
-        then 
-            echo "player1 win"
-            break
-        fi    
-    
-        if [ $positionOfPlayerOne -lt 0 ]
-        then 
-            positionOfPlayerOne=0
-        fi
-        echo "Position1:" $positionOfPlayerOne
-     fi
-     if [ $i -eq 2 ]
-     then
-         toDie
-         getPositionForPlayer2
-         if [ $positionOfPlayerTwo -gt 100 ]
-         then 
-             positionOfPlayerTwo=$(($positionOfPlayerTwo-$random))
-         fi
-    
-         if [ $positionOfPlayerTwo -eq 100 ]
-         then 
-             echo  "player2 win"
-         break
-         fi    
-    
-         if [ $positionOfPlayerTwo -lt 0 ]
-         then 
-             positionOfPlayerTwo=0
-         fi
-         echo "Player2:" $positionOfPlayerTwo
+if [ $(( $switchPlayers % 2 )) -eq 0  ]
+then
 
-     fi
-  done
+     positionOfPlayer=$positionOfPlayerOne
+     rollDice
+     checkIfLadderComes
+     positionOfPlayerOne=$positionOfPlayer
+     
+else
+
+     positionOfPlayer=$positionOfPlayerTwo
+     rollDice
+     checkIfLadderComes
+     positionOfPlayerTwo=$positionOfPlayer   
+fi
 }
+
+
+function whoWins() {
+    
+while [ $positionOfPlayer -lt $END ]
+do
+     play
+ 
+     if [ $positionOfPlayerOne -eq $END ]
+     then
+        echo "Player One win"
+     elif [  $positionOfPlayerTwo -eq $END ]
+     then
+        echo "Player Two win"   
+     fi   
+        
+        switchPlayers=$(( $switchPlayers + 1 )) 
+done
+}
+
 whoWins
-echo dice count :$totalDiePlayed
 
